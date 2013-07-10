@@ -6,8 +6,8 @@ app.get('/', function(request, response) {
 //    var buf = new Buffer(256);
 //    buf.write(fs.readFileSync("./index.html"));
 //    response.send(buf.toString());
-    var text = fs.readFileSync("./index.html"));
-	response.send(text.toString());    
+    var buf = fs.readFileSync("index.html");
+	response.send(buf.toString());    
 // response.send(fs.readFileSync("./index.html"));
 });
 
