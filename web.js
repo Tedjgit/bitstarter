@@ -7,7 +7,7 @@ app.get('/', function(request, response) {
 //    buf.write(fs.readFileSync("./index.html"));
 //    response.send(buf.toString());
     var text = fs.readFileSync("./index.html"));
-	response.end(text.toString());    
+	response.send(text.toString());    
 // response.send(fs.readFileSync("./index.html"));
 });
 
