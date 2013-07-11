@@ -27,7 +27,7 @@ var program = require('commander');
 var cheerio = require('cheerio');
 var HTMLFILE_DEFAULT = "index.html";
 var CHECKSFILE_DEFAULT = "checks.json";
-var URL_DEFAULT = "http://google.com";
+var URL_DEFAULT = "http://fast-lake-9370.herokuapp.com/";
 
 var assertUrlExists = function(val) {
     return val.toString();
@@ -50,8 +50,8 @@ var loadChecks = function(checksfile) {
     return JSON.parse(fs.readFileSync(checksfile));
 };
 
-var buildfn = function(checksfile) {
-    var async_fun = function(result, response) {
+var checkHtmlFile_DownloadedFromTheUrl = function(url, checksfile) {
+    var asynchronous_fun = function(result, response) {
 	if (result instanceof Error) {
 	    console.error('Error: ' + util.format(response.message));
 	} else {
@@ -61,16 +61,10 @@ var buildfn = function(checksfile) {
 	    console.log(outJson);
 	}
     };
-//    console.log("returning from buildfn");
-    return async_fun;
-};
-
-
-var write_to_file = function(url, checksfile) {
-    var response_on_completion = buildfn(checksfile);
-//    console.log("Entering get-on-complete url: " + url);
-    rest.get(url).on('complete', response_on_completion);
-//    console.log("DONE: get-on-complete url : " + url);
+    // rest.get(url).on returns immediately, but the call-back will not return until the get operation completes
+    // Since out core toutine checkHtmlFile requires the html file, everything needs to be done in the call-back
+    // asyuchronously.
+   rest.get(url).on('complete', asynchronous_fun);
 };
 
 var checkHtmlFile = function(htmlfile, checksfile) {
@@ -96,12 +90,17 @@ if(require.main == module) {
 	.option('-f, --file <html_file>', 'Path to index.html', clone(assertFileExists), HTMLFILE_DEFAULT)
 	.option('-u, --url <url>', 'url to check', clone(assertUrlExists), URL_DEFAULT)
 	.parse(process.argv);
+    if (program.file) {
+       console.log("checks file: " + program.checks);
+       console.log("local file: " + program.file);
+       var checkJson = checkHtmlFile(program.file, program.checks);
+       var outJson = JSON.stringify(checkJson, null, 4);
+       console.log(outJson);
+    }
     if (program.url) {
-	write_to_file(program.url, program.checks);
-    } else {
-    var checkJson = checkHtmlFile(program.file, program.checks);
-    var outJson = JSON.stringify(checkJson, null, 4);
-    console.log(outJson);
+        console.log("checks file: " + program.checks);
+        console.log("url: " + program.url);
+	checkHtmlFile_DownloadedFromTheUrl(program.url, program.checks);
     }
 } else {
     exports.checkHtmlFile = checkHtmlFile;
