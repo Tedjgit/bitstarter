@@ -61,16 +61,16 @@ var buildfn = function(checksfile) {
 	    console.log(outJson);
 	}
     };
-    console.log("returning from buildfn");
+//    console.log("returning from buildfn");
     return async_fun;
 };
 
 
 var write_to_file = function(url, checksfile) {
     var response_on_completion = buildfn(checksfile);
-    console.log("Entering get-on-complete url: " + url);
+//    console.log("Entering get-on-complete url: " + url);
     rest.get(url).on('complete', response_on_completion);
-    console.log("DONE: get-on-complete url : " + url);
+//    console.log("DONE: get-on-complete url : " + url);
 };
 
 var checkHtmlFile = function(htmlfile, checksfile) {
