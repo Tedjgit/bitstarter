@@ -29,6 +29,10 @@ var HTMLFILE_DEFAULT = "index.html";
 var CHECKSFILE_DEFAULT = "checks.json";
 var URL_DEFAULT = "http://google.com";
 
+var assertUrlExists = function(val) {
+    return val.toString();
+};
+
 var assertFileExists = function(infile) {
     var instr = infile.toString();
     if(!fs.existsSync(instr)) {
@@ -46,15 +50,27 @@ var loadChecks = function(checksfile) {
     return JSON.parse(fs.readFileSync(checksfile));
 };
 
-var write_to_file = function(url) {
-    var response_on_completion = function(result, response) {
+var buildfn = function(checksfile) {
+    var async_fun = function(result, response) {
 	if (result instanceof Error) {
 	    console.error('Error: ' + util.format(response.message));
 	} else {
-	   fs.writeFileSync(HTMLFILE_DEFAULT, result);
+	    fs.writeFileSync("downloadedfile.html", result);
+	    var checkJson = checkHtmlFile("downloadedfile.html", checksfile);
+	    var outJson = JSON.stringify(checkJson, null, 4);
+	    console.log(outJson);
 	}
     };
+    console.log("returning from buildfn");
+    return async_fun;
+};
+
+
+var write_to_file = function(url, checksfile) {
+    var response_on_completion = buildfn(checksfile);
+    console.log("Entering get-on-complete url: " + url);
     rest.get(url).on('complete', response_on_completion);
+    console.log("DONE: get-on-complete url : " + url);
 };
 
 var checkHtmlFile = function(htmlfile, checksfile) {
@@ -78,11 +94,15 @@ if(require.main == module) {
     program
 	.option('-c, --checks <check_file>', 'Path to checks.json', clone(assertFileExists), CHECKSFILE_DEFAULT)
 	.option('-f, --file <html_file>', 'Path to index.html', clone(assertFileExists), HTMLFILE_DEFAULT)
-	.option('-u, --url <url>', 'URLhto an HTML file', clone(assertFileExists), URL_DEFAULT)
+	.option('-u, --url <url>', 'url to check', clone(assertUrlExists), URL_DEFAULT)
 	.parse(process.argv);
+    if (program.url) {
+	write_to_file(program.url, program.checks);
+    } else {
     var checkJson = checkHtmlFile(program.file, program.checks);
     var outJson = JSON.stringify(checkJson, null, 4);
     console.log(outJson);
+    }
 } else {
     exports.checkHtmlFile = checkHtmlFile;
 }
