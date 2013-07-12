@@ -53,7 +53,7 @@ var loadChecks = function(checksfile) {
 var checkHtmlFile_DownloadedFromTheUrl = function(url, checksfile) {
     var asynchronous_fun = function(result, response) {
 	if (result instanceof Error) {
-	    console.error('Error: ' + util.format(response.message));
+	    console.error('Error while trying to access ' + url);
 	} else {
 	    fs.writeFileSync("downloadedfile.html", result);
 	    var checkJson = checkHtmlFile("downloadedfile.html", checksfile);
@@ -98,8 +98,8 @@ if(require.main == module) {
        console.log(outJson);
     }
     if (program.url) {
-        console.log("checks file: " + program.checks);
-        console.log("url: " + program.url);
+	console.log("checks file: " + program.checks);
+	console.log("url: " + program.url);
 	checkHtmlFile_DownloadedFromTheUrl(program.url, program.checks);
     }
 } else {
