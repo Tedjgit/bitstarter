@@ -8,12 +8,12 @@ app.get('/', function(request, response) {
     response.send(buf.toString());
 });
 
-app.get('/hw3', function(request, response) {
+app.get('/3', function(request, response) {
     var buf = fs.readFileSync("bitstarter-hw3.html");
     response.send(buf.toString());
 });
 
-app.get('/hw4', function(request, response) {
+app.get('/4', function(request, response) {
     var buf = fs.readFileSync("bitstarter-hw4.html");
     response.send(buf.toString());
 });
@@ -23,7 +23,11 @@ app.get('/1', function(request, response) {
     response.send("1");
 });
 
-var port = process.env.PORT || 5000;
+app.get('/2', function(request, response) {
+    response.send("2");
+});
+
+var port = process.env.PORT || 8080; /* used to be 5000 */
 app.listen(port, function() {
   console.log("Listening on " + port);
 });
